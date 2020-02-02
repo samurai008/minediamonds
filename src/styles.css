@@ -1,3 +1,29 @@
 body {
   font-family: sans-serif;
 }
+
+.square {
+  width: 75px;
+  height: 75px;
+  background: lightblue;
+  border: 1px solid darkcyan;
+  border-right: 0;
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+  box-sizing: border-box;
+  border-bottom: none;
+}
+
+.square:last-child {
+  border-right: 1px solid darkcyan;
+}
+
+div[id^="row_"]:last-child > .square {
+  border-bottom: 1px solid darkcyan;
+}
+
+.diamond {
+  width: 70%;
+  height: 70%;
+}
