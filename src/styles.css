@@ -38,3 +38,13 @@ div[id^="row_"]:last-child > .square {
   padding: 16px;
   bottom: calc(50% + 32px);
 }
+
+.replay-btn {
+  background: darkorchid;
+  color: white;
+  font-weight: bold;
+  font-size: 1.5rem;
+  border: none;
+  box-shadow: none;
+  padding: 0 1rem;
+}

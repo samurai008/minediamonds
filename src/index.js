@@ -9,47 +9,61 @@ import arrow from './arrow.svg';
 const SIZE_X = 8;
 const SIZE_Y = 8;
 
-let board = {};
-let gameOver = false;
-let turnedSquares = 0;
-let totalDiamonds = 0;
-let arrowPathCache = {};
+let board;
+let score;
+let turnedSquares;
+let totalDiamonds;
+let replayBtn;
 const appEl = document.getElementById('app');
-const boardEl = document.createElement('div');
-const scoreboardEl = document.createElement('div');
-scoreboardEl.classList.add('scoreboard');
+let boardEl;
+let scoreboardEl;
 
-appEl.appendChild(boardEl);
-appEl.appendChild(scoreboardEl);
+function initializse() {
+  turnedSquares = 0;
+  totalDiamonds = 0;
 
-let squareEl;
-let rowEl;
-let randomBool;
-for (let i = 0; i < SIZE_X; i++) {
-  rowEl = document.createElement('div');
-  boardEl.appendChild(rowEl);
-  board[i] = [];
-  for (let j = 0; j < SIZE_Y; j++) {
-    squareEl = document.createElement('div');
-    squareEl.setAttribute('data-col', + j);
-    squareEl.setAttribute('data-row', + i);
-    squareEl.classList.add('square');
-    squareEl.innerHTML = '?';
-    squareEl.addEventListener('click', handleSquareClick);
-    rowEl.appendChild(squareEl);
-    // will there be a diamond
-    randomBool = Math.random() >= 0.5;
-    board[i][j] = { diamond: randomBool, clicked: false };
-    if (randomBool) {
-      totalDiamonds = totalDiamonds + 1;
+  boardEl = document.createElement('div');
+  scoreboardEl = document.createElement('div');
+
+  scoreboardEl.classList.add('scoreboard');
+
+  appEl.appendChild(boardEl);
+  appEl.appendChild(scoreboardEl);
+
+  if (replayBtn) {
+    appEl.removeChild(replayBtn);
+  }
+
+  board = {};
+  let squareEl;
+  let rowEl;
+  let randomBool;
+  for (let i = 0; i < SIZE_X; i++) {
+    rowEl = document.createElement('div');
+    boardEl.appendChild(rowEl);
+    board[i] = [];
+    for (let j = 0; j < SIZE_Y; j++) {
+      squareEl = document.createElement('div');
+      squareEl.setAttribute('data-col', + j);
+      squareEl.setAttribute('data-row', + i);
+      squareEl.classList.add('square');
+      squareEl.innerHTML = '?';
+      squareEl.addEventListener('click', handleSquareClick);
+      rowEl.appendChild(squareEl);
+      // will there be a diamond
+      randomBool = Math.random() >= 0.5;
+      board[i][j] = { diamond: randomBool, clicked: false };
+      if (randomBool) {
+        totalDiamonds = totalDiamonds + 1;
+      }
     }
   }
+
+  score = (SIZE_X * SIZE_Y) - turnedSquares;
+  scoreboardEl.innerHTML = score;
 }
 
 // implement gameover
-
-scoreboardEl.innerHTML = (SIZE_X * SIZE_Y) - turnedSquares;
-
 function dfs(row, col, paths = []) {
   let S = [];
   let Visited = [];
@@ -124,7 +138,13 @@ function handleSquareClick(e) {
   const el = e.target;
   const row = parseInt(el.getAttribute('data-row'));
   const col = parseInt(el.getAttribute('data-col'));
-  console.log(row, col);
+
+  // update the score
+  if (!board[row][col].clicked) {
+    turnedSquares = turnedSquares + 1;
+    score = (SIZE_X * SIZE_Y) - turnedSquares;
+  }
+
   board[row][col].clicked = true;
   if (board[row][col].diamond) {
     // el.innerHTML = '<img src="' + diamond + '" class="diamond" />';
@@ -133,7 +153,9 @@ function handleSquareClick(e) {
     el.style.backgroundRepeat = 'no-repeat';
     el.style.backgroundPosition = 'center';
     el.innerHTML = '';
-    totalDiamonds = totalDiamonds - 1;
+    if (!board[row][col].clicked) {
+      totalDiamonds = totalDiamonds - 1;
+    }
   } else {
     // show hint
     el.innerHTML = '<img src="' + arrow + '" style="width: 70%; transform: rotate(' + dfs(row, col) + 'deg" />';
@@ -143,7 +165,21 @@ function handleSquareClick(e) {
     }, 800);
   }
 
-  // update the score
-  turnedSquares = turnedSquares + 1;
-  scoreboardEl.innerHTML = (SIZE_X * SIZE_Y) - turnedSquares;
+  scoreboardEl.innerHTML = score;
+
+  if (totalDiamonds === 0 || score === 0) {
+    replayBtn = document.createElement('button');
+    replayBtn.setAttribute('id', 'remove_btn');
+    replayBtn.setAttribute('class', 'replay-btn')
+    replayBtn.innerHTML = 'Replay';
+    appEl.appendChild(replayBtn);
+    appEl.removeChild(boardEl);
+    replayBtn.addEventListener('click', function () {
+      appEl.removeChild(scoreboardEl);
+      initializse();
+    })
+  }
 }
+
+// when the app loads!
+initializse();
