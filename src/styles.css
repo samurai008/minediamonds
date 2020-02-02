@@ -27,3 +27,14 @@ div[id^="row_"]:last-child > .square {
   width: 70%;
   height: 70%;
 }
+
+.scoreboard {
+  background: darkorchid;
+  color: white;
+  font-weight: bold;
+  font-size: 1.5rem;
+  position: absolute;
+  right: 0;
+  padding: 16px;
+  bottom: calc(50% + 32px);
+}

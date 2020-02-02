@@ -9,10 +9,14 @@ const SIZE_X = 8;
 const SIZE_Y = 8;
 
 let board = [];
+let turnedSquares = 0;
 const appEl = document.getElementById('app');
 const boardEl = document.createElement('div');
+const scoreboardEl = document.createElement('div');
+scoreboardEl.classList.add('scoreboard');
 
 appEl.appendChild(boardEl);
+appEl.appendChild(scoreboardEl);
 
 let squareEl;
 let rowEl;
@@ -33,7 +37,7 @@ for (let i = 0; i < SIZE_X; i++) {
   }
 }
 
-console.log(diamond);
+scoreboardEl.innerHTML = (SIZE_X * SIZE_Y) - turnedSquares;
 
 function handleSquareClick(e) {
   const el = e.target;
@@ -44,4 +48,8 @@ function handleSquareClick(e) {
   } else {
     el.innerHTML = '';
   }
+
+  // update the score
+  turnedSquares = turnedSquares + 1;
+  scoreboardEl.innerHTML = (SIZE_X * SIZE_Y) - turnedSquares;
 }
