@@ -17,6 +17,7 @@ let totalDiamonds;
 let replayBtn;
 let boardEl;
 let scoreboardEl;
+let winMessage;
 
 const appEl = document.getElementById('app');
 
@@ -38,6 +39,11 @@ function initializse() {
   // remove replay button on new game
   if (replayBtn) {
     appEl.removeChild(replayBtn);
+  }
+
+  // remove win message on new game
+  if (winMessage) {
+    appEl.removeChild(winMessage);
   }
 
   // setup the board
@@ -199,6 +205,13 @@ function handleSquareClick(e) {
 
   // gameover
   if ((totalDiamonds === 0 || score === 0) && !replayBtn) {
+    // if player wins the game
+    if (totalDiamonds === 0) {
+      winMessage = document.createElement('div');
+      winMessage.classList.add('win-msg');
+      winMessage.innerHTML = 'You won the game!';
+    }
+
     replayBtn = document.createElement('button');
     replayBtn.setAttribute('id', 'remove_btn');
     replayBtn.setAttribute('class', 'replay-btn');

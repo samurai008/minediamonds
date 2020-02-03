@@ -19,7 +19,7 @@ body {
   border-right: 1px solid darkcyan;
 }
 
-div[id^="row_"]:last-child > .square {
+div[id^='row_']:last-child > .square {
   border-bottom: 1px solid darkcyan;
 }
 
@@ -47,4 +47,11 @@ div[id^="row_"]:last-child > .square {
   border: none;
   box-shadow: none;
   padding: 0 1rem;
+}
+
+.win-msg {
+  padding: 0.5rem 1rem;
+  color: lightsalmon;
+  font-weight: bold;
+  font-size: 1.5rem;
 }
