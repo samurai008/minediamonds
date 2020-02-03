@@ -1,4 +1,4 @@
-import "./styles.css";
+import './styles.css';
 import diamond from './diamond.svg';
 import arrow from './arrow.svg';
 
@@ -9,31 +9,38 @@ import arrow from './arrow.svg';
 const SIZE_X = 8;
 const SIZE_Y = 8;
 
+// global variables
 let board;
 let score;
 let turnedSquares;
 let totalDiamonds;
 let replayBtn;
-const appEl = document.getElementById('app');
 let boardEl;
 let scoreboardEl;
 
+const appEl = document.getElementById('app');
+
+// function initialises the board
 function initializse() {
   turnedSquares = 0;
   totalDiamonds = 0;
 
   boardEl = document.createElement('div');
-  scoreboardEl = document.createElement('div');
-
-  scoreboardEl.classList.add('scoreboard');
-
   appEl.appendChild(boardEl);
-  appEl.appendChild(scoreboardEl);
 
+  // create scoreboard
+  if (!scoreboardEl) {
+    scoreboardEl = document.createElement('div');
+    appEl.appendChild(scoreboardEl);
+    scoreboardEl.classList.add('scoreboard');
+  }
+
+  // remove replay button on new game
   if (replayBtn) {
     appEl.removeChild(replayBtn);
   }
 
+  // setup the board
   board = {};
   let squareEl;
   let rowEl;
@@ -44,8 +51,8 @@ function initializse() {
     board[i] = [];
     for (let j = 0; j < SIZE_Y; j++) {
       squareEl = document.createElement('div');
-      squareEl.setAttribute('data-col', + j);
-      squareEl.setAttribute('data-row', + i);
+      squareEl.setAttribute('data-col', +j);
+      squareEl.setAttribute('data-row', +i);
       squareEl.classList.add('square');
       squareEl.innerHTML = '?';
       squareEl.addEventListener('click', handleSquareClick);
@@ -59,12 +66,13 @@ function initializse() {
     }
   }
 
-  score = (SIZE_X * SIZE_Y) - turnedSquares;
+  // update to initial score
+  score = SIZE_X * SIZE_Y - turnedSquares;
   scoreboardEl.innerHTML = score;
 }
 
-// implement gameover
-function dfs(row, col, paths = []) {
+// depth first search to return the angle at which the first diamond is undiscovered
+function dfs(row, col) {
   let S = [];
   let Visited = [];
   S.push({ row, col, visited: false });
@@ -78,6 +86,7 @@ function dfs(row, col, paths = []) {
     if (Visited.filter(v => v === board[r][c]).length === 0) {
       Visited.push(board[r][c]);
 
+      // direction to point to
       if (board[r][c].diamond && !board[r][c].clicked && !findNearest) {
         if (row > r && col === c) {
           // north
@@ -109,23 +118,36 @@ function dfs(row, col, paths = []) {
         break;
       }
 
+      // adjacent blocks in the board
       // up
-      if (board[r - 1] && Visited.filter(v => v === board[r - 1][c]).length === 0) {
-        S.push({ row: r - 1, col: c});
+      if (
+        board[r - 1] &&
+        Visited.filter(v => v === board[r - 1][c]).length === 0
+      ) {
+        S.push({ row: r - 1, col: c });
       }
 
       // down
-      if (board[r + 1] && Visited.filter(v => v === board[r + 1][c]).length === 0) {
+      if (
+        board[r + 1] &&
+        Visited.filter(v => v === board[r + 1][c]).length === 0
+      ) {
         S.push({ row: r + 1, col: c });
       }
 
       // left
-      if (board[r][c - 1] && Visited.filter(v => v === board[r][c - 1]).length === 0) {
+      if (
+        board[r][c - 1] &&
+        Visited.filter(v => v === board[r][c - 1]).length === 0
+      ) {
         S.push({ row: r, col: c - 1 });
       }
 
       // right
-      if (board[r][c + 1] && Visited.filter(v => v === board[r][c + 1]).length === 0) {
+      if (
+        board[r][c + 1] &&
+        Visited.filter(v => v === board[r][c + 1]).length === 0
+      ) {
         S.push({ row: r, col: c + 1 });
       }
     }
@@ -140,9 +162,9 @@ function handleSquareClick(e) {
   const col = parseInt(el.getAttribute('data-col'));
 
   // update the score
-  if (!board[row][col].clicked) {
+  if ((!board[row][col].clicked || !board[row][col].diamond) && score > 0) {
     turnedSquares = turnedSquares + 1;
-    score = (SIZE_X * SIZE_Y) - turnedSquares;
+    score = SIZE_X * SIZE_Y - turnedSquares;
   }
 
   board[row][col].clicked = true;
@@ -158,26 +180,35 @@ function handleSquareClick(e) {
     }
   } else {
     // show hint
-    el.innerHTML = '<img src="' + arrow + '" style="width: 70%; transform: rotate(' + dfs(row, col) + 'deg" />';
-    setTimeout(function () {
+    el.innerHTML =
+      '<img src="' +
+      arrow +
+      '" style="width: 70%; transform: rotate(' +
+      dfs(row, col) +
+      'deg" />';
+
+    // show the arrow for 800ms
+    setTimeout(function() {
       el.removeChild(el.childNodes[0]);
       el.innerHTML = '?';
     }, 800);
   }
 
+  // update the scoreboard
   scoreboardEl.innerHTML = score;
 
-  if (totalDiamonds === 0 || score === 0) {
+  // gameover
+  if ((totalDiamonds === 0 || score === 0) && !replayBtn) {
     replayBtn = document.createElement('button');
     replayBtn.setAttribute('id', 'remove_btn');
-    replayBtn.setAttribute('class', 'replay-btn')
+    replayBtn.setAttribute('class', 'replay-btn');
     replayBtn.innerHTML = 'Replay';
     appEl.appendChild(replayBtn);
-    appEl.removeChild(boardEl);
-    replayBtn.addEventListener('click', function () {
-      appEl.removeChild(scoreboardEl);
+    replayBtn.addEventListener('click', function() {
+      // reset the game
+      appEl.removeChild(boardEl);
       initializse();
-    })
+    });
   }
 }
 
